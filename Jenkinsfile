@@ -13,8 +13,6 @@ pipeline {
                 deleteDir()
 
                 sh '''
-                    echo "Starting Build"
-
                     git clone https://github.com/Najil-kk/restuarent.git
 
                     ls -la restuarent
@@ -28,7 +26,7 @@ pipeline {
 
         stage('Deploy') {
             agent {
-                label 'buildnode'
+                label 'deploynode'
             }
 
             steps {
@@ -47,7 +45,7 @@ pipeline {
 
                     sudo systemctl restart nginx
 
-                    echo "Nginx Deployment Successful"
+                    echo "Deployment Completed"
 
                     ls -la /var/www/html/
                 '''
