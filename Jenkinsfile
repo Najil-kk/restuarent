@@ -1,4 +1,3 @@
-
 pipeline {
     agent none
 
@@ -13,13 +12,14 @@ pipeline {
                 deleteDir()
 
                 sh '''
-                    git clone https://github.com/Najil-kk/restuarent.git
+                    git clone https://github.com/Najil-kk/My-details.git
 
-                    ls -la restuarent
+                    ls -la
+                    ls -la My-details
                 '''
 
                 stash name: 'webpage',
-                      includes: 'restuarent/**',
+                      includes: 'My-details/**',
                       useDefaultExcludes: false
             }
         }
@@ -35,31 +35,13 @@ pipeline {
                 unstash 'webpage'
 
                 sh '''
-                    echo "Starting Nginx Deployment"
-
-                    sudo mkdir -p /var/www/html
-
                     sudo rm -rf /var/www/html/*
 
-                    sudo cp -r restuarent/. /var/www/html/
-
-                    sudo systemctl restart nginx
-
-                    echo "Deployment Completed"
+                    sudo cp -r My-details/. /var/www/html/
 
                     ls -la /var/www/html/
                 '''
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'BUILD AND DEPLOYMENT SUCCESSFUL!'
-        }
-
-        failure {
-            echo 'BUILD OR DEPLOYMENT FAILED!'
         }
     }
 }
