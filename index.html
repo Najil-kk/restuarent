@@ -1,0 +1,532 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Restaurant Billing System</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f3f4f6;
+    padding: 20px;
+    color: #222;
+}
+
+header {
+    background: #991b1b;
+    color: white;
+    text-align: center;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+header h1 {
+    margin-bottom: 8px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 20px;
+}
+
+.panel {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #0001;
+}
+
+h2 {
+    margin-bottom: 18px;
+    color: #991b1b;
+}
+
+.customer input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 0;
+    border-bottom: 1px solid #eee;
+    gap: 10px;
+}
+
+.menu-item button {
+    background: #991b1b;
+    color: white;
+    border: none;
+    padding: 9px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.menu-item button:hover {
+    background: #7f1d1d;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 10px 5px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.qty-btn {
+    padding: 4px 8px;
+    margin: 2px;
+    cursor: pointer;
+    border: none;
+    background: #e5e7eb;
+    border-radius: 4px;
+}
+
+.remove-btn {
+    color: #dc2626;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.summary {
+    margin-top: 20px;
+    line-height: 2.2;
+}
+
+.summary div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.grand-total {
+    font-size: 21px;
+    font-weight: bold;
+    color: #991b1b;
+    border-top: 2px solid #ddd;
+    padding-top: 10px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.actions button {
+    flex: 1;
+    padding: 13px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+}
+
+.print-btn {
+    background: #15803d;
+}
+
+.clear-btn {
+    background: #dc2626;
+}
+
+.empty {
+    color: #888;
+    text-align: center;
+    padding: 25px 0;
+}
+
+@media(max-width: 750px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+
+    header, .menu-panel, .actions,
+    .customer {
+        display: none !important;
+    }
+
+    .container {
+        display: block;
+    }
+
+    .panel {
+        box-shadow: none;
+    }
+
+    .qty-btn, .remove-btn {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🍽️ TASTY RESTAURANT</h1>
+    <p>Restaurant Billing Management System</p>
+</header>
+
+<div class="container">
+
+    <section class="panel menu-panel">
+        <h2>Food Menu</h2>
+
+        <div id="menu"></div>
+    </section>
+
+    <section class="panel">
+
+        <h2>Customer Details</h2>
+
+        <div class="customer">
+            <input type="text" id="customer"
+                   placeholder="Customer Name">
+
+            <input type="text" id="table"
+                   placeholder="Table Number">
+        </div>
+
+        <h2>Order Bill</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody id="billItems">
+                <tr>
+                    <td colspan="5" class="empty">
+                        No items added
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="summary">
+
+            <div>
+                <span>Subtotal</span>
+                <span id="subtotal">₹0.00</span>
+            </div>
+
+            <div>
+                <span>GST (5%)</span>
+                <span id="gst">₹0.00</span>
+            </div>
+
+            <div class="grand-total">
+                <span>Grand Total</span>
+                <span id="grandTotal">₹0.00</span>
+            </div>
+
+        </div>
+
+        <div class="actions">
+            <button class="print-btn" onclick="printBill()">
+                Print Bill
+            </button>
+
+            <button class="clear-btn" onclick="clearBill()">
+                Clear Bill
+            </button>
+        </div>
+
+    </section>
+
+</div>
+
+<script>
+
+const products = [
+    {name: "Chicken Biriyani", price: 150},
+    {name: "Beef Biriyani", price: 180},
+    {name: "Fried Rice", price: 120},
+    {name: "Chicken Fried Rice", price: 160},
+    {name: "Porotta", price: 15},
+    {name: "Chicken Curry", price: 120},
+    {name: "Beef Curry", price: 150},
+    {name: "Masala Dosa", price: 60},
+    {name: "Veg Meals", price: 100},
+    {name: "Fresh Lime", price: 30},
+    {name: "Tea", price: 15},
+    {name: "Coffee", price: 25}
+];
+
+let cart = [];
+
+const money = amount =>
+    "₹" + amount.toFixed(2);
+
+function showMenu() {
+
+    const menu = document.getElementById("menu");
+
+    menu.innerHTML = products.map((item, index) => `
+        <div class="menu-item">
+            <div>
+                <strong>${item.name}</strong>
+                <br>
+                ${money(item.price)}
+            </div>
+
+            <button onclick="addItem(${index})">
+                Add +
+            </button>
+        </div>
+    `).join("");
+}
+
+function addItem(index) {
+
+    const product = products[index];
+
+    const existing = cart.find(
+        item => item.name === product.name
+    );
+
+    if (existing) {
+        existing.qty++;
+    } else {
+        cart.push({
+            name: product.name,
+            price: product.price,
+            qty: 1
+        });
+    }
+
+    updateBill();
+}
+
+function changeQty(index, amount) {
+
+    cart[index].qty += amount;
+
+    if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+    }
+
+    updateBill();
+}
+
+function removeItem(index) {
+
+    cart.splice(index, 1);
+
+    updateBill();
+}
+
+function updateBill() {
+
+    const tbody = document.getElementById("billItems");
+
+    if (cart.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="empty">
+                    No items added
+                </td>
+            </tr>
+        `;
+
+    } else {
+
+        tbody.innerHTML = cart.map((item, index) => `
+            <tr>
+                <td>${item.name}</td>
+
+                <td>${money(item.price)}</td>
+
+                <td>
+                    <button class="qty-btn"
+                        onclick="changeQty(${index}, -1)">-</button>
+
+                    ${item.qty}
+
+                    <button class="qty-btn"
+                        onclick="changeQty(${index}, 1)">+</button>
+                </td>
+
+                <td>${money(item.price * item.qty)}</td>
+
+                <td>
+                    <button class="remove-btn"
+                        onclick="removeItem(${index})">
+                        ✕
+                    </button>
+                </td>
+            </tr>
+        `).join("");
+    }
+
+    const subtotal = cart.reduce(
+        (sum, item) => sum + item.price * item.qty, 0
+    );
+
+    const gst = subtotal * 0.05;
+
+    const grandTotal = subtotal + gst;
+
+    document.getElementById("subtotal").textContent =
+        money(subtotal);
+
+    document.getElementById("gst").textContent =
+        money(gst);
+
+    document.getElementById("grandTotal").textContent =
+        money(grandTotal);
+}
+
+function printBill() {
+
+    if (cart.length === 0) {
+        alert("Please add food items first!");
+        return;
+    }
+
+    const customer =
+        document.getElementById("customer").value.trim();
+
+    if (!customer) {
+        alert("Please enter customer name!");
+        return;
+    }
+
+    const table =
+        document.getElementById("table").value || "N/A";
+
+    const subtotal = cart.reduce(
+        (sum, item) => sum + item.price * item.qty, 0
+    );
+
+    const gst = subtotal * 0.05;
+
+    const grandTotal = subtotal + gst;
+
+    const receipt = `
+        <div style="font-family:Arial;max-width:500px;margin:auto">
+            <h2 style="text-align:center">TASTY RESTAURANT</h2>
+            <p style="text-align:center">Customer Bill</p>
+            <hr>
+            <p>Customer: ${escapeHTML(customer)}</p>
+            <p>Table: ${escapeHTML(table)}</p>
+            <p>Date: ${new Date().toLocaleString()}</p>
+            <hr>
+            <table style="width:100%;border-collapse:collapse">
+                <tr>
+                    <th align="left">Item</th>
+                    <th>Qty</th>
+                    <th align="right">Amount</th>
+                </tr>
+                ${cart.map(item => `
+                    <tr>
+                        <td>${escapeHTML(item.name)}</td>
+                        <td align="center">${item.qty}</td>
+                        <td align="right">${money(item.price * item.qty)}</td>
+                    </tr>
+                `).join("")}
+            </table>
+            <hr>
+            <p>Subtotal: ${money(subtotal)}</p>
+            <p>GST (5%): ${money(gst)}</p>
+            <h3>Grand Total: ${money(grandTotal)}</h3>
+            <hr>
+            <p style="text-align:center">Thank You! Visit Again.</p>
+        </div>
+    `;
+
+    const win = window.open("", "_blank");
+
+    if (!win) {
+        alert("Please allow pop-ups to print the bill.");
+        return;
+    }
+
+    win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Restaurant Bill</title>
+        </head>
+        <body>${receipt}</body>
+        </html>
+    `);
+
+    win.document.close();
+    win.focus();
+
+    setTimeout(() => {
+        win.print();
+        win.close();
+    }, 300);
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+function clearBill() {
+
+    if (confirm("Are you sure you want to clear the bill?")) {
+
+        cart = [];
+
+        document.getElementById("customer").value = "";
+        document.getElementById("table").value = "";
+
+        updateBill();
+    }
+}
+
+showMenu();
+updateBill();
+
+</script>
+
+</body>
+</html>
