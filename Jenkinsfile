@@ -13,11 +13,9 @@ pipeline {
                 deleteDir()
 
                 sh '''
-                    echo "Starting Build Stage"
+                    echo "Starting Build"
 
                     git clone https://github.com/Najil-kk/restuarent.git
-
-                    echo "Repository cloned successfully"
 
                     ls -la restuarent
                 '''
@@ -39,13 +37,17 @@ pipeline {
                 unstash 'webpage'
 
                 sh '''
-                    echo "Starting Deployment"
+                    echo "Starting Nginx Deployment"
+
+                    sudo mkdir -p /var/www/html
 
                     sudo rm -rf /var/www/html/*
 
                     sudo cp -r restuarent/. /var/www/html/
 
-                    echo "Deployment completed successfully"
+                    sudo systemctl restart nginx
+
+                    echo "Nginx Deployment Successful"
 
                     ls -la /var/www/html/
                 '''
