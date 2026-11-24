@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nahdi Mandi - Restaurant & Admin Portal</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-body">
+    <div class="login-wrapper">
+        <div class="login-banner">
+            <h1>Nahdi <span>Mandi</span></h1>
+            <p>Authentic Arabian Mandi Restaurant Management, Online Ordering, Purchase Tracking & Profit/Loss Center.</p>
+            <div class="demo-box">
+                <h4>Quick Demo Credentials:</h4>
+                <p><strong>Customer:</strong> customer@nahdi.com / 1234</p>
+                <p><strong>Admin / Owner:</strong> admin@nahdi.com / admin123</p>
+            </div>
+        </div>
+        <div class="login-card">
+            <div class="role-tabs">
+                <button id="tab-user" class="active" onclick="selectRole('user')">Customer Login</button>
+                <button id="tab-admin" onclick="selectRole('admin')">Admin / Owner Login</button>
+            </div>
+            <h2 id="login-title">Welcome to Nahdi Mandi!</h2>
+            <p class="sub-text" id="login-sub">Sign in as a customer to order delicious mandi items</p>
+            
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="login-email" value="customer@nahdi.com" required placeholder="Enter email">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="login-pass" value="1234" required placeholder="Enter password">
+                </div>
+                <p id="login-error" class="error-msg"></p>
+                <button type="submit" class="btn-primary full-width">Login to Portal</button>
+            </form>
+        </div>
+    </div>
+    <script src="js/data.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>
