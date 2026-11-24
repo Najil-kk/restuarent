@@ -1,3 +1,4 @@
+
 pipeline {
     agent none
 
@@ -11,8 +12,12 @@ pipeline {
             steps {
                 deleteDir()
 
+                echo 'Starting Build Stage'
+
                 sh '''
                     git clone https://github.com/Najil-kk/restuarent.git
+
+                    echo "Repository cloned successfully"
 
                     ls -la
                     ls -la restuarent
@@ -21,6 +26,8 @@ pipeline {
                 stash name: 'webpage',
                       includes: 'restuarent/**',
                       useDefaultExcludes: false
+
+                echo 'Build Stage Completed'
             }
         }
 
@@ -34,14 +41,32 @@ pipeline {
 
                 unstash 'webpage'
 
+                echo 'Starting Nginx Deployment'
+
                 sh '''
+                    sudo mkdir -p /var/www/html
+
                     sudo rm -rf /var/www/html/*
 
                     sudo cp -r restuarent/. /var/www/html/
 
+                    sudo systemctl restart nginx
+
+                    echo "Deployment Completed Successfully"
+
                     ls -la /var/www/html/
                 '''
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'BUILD AND DEPLOYMENT SUCCESSFUL!'
+        }
+
+        failure {
+            echo 'BUILD OR DEPLOYMENT FAILED!'
         }
     }
 }
