@@ -12,14 +12,14 @@ pipeline {
                 deleteDir()
 
                 sh '''
-                    git clone https://github.com/Najil-kk/My-details.git
+                    git clone https://github.com/Najil-kk/restuarent.git
 
                     ls -la
-                    ls -la My-details
+                    ls -la restuarent
                 '''
 
                 stash name: 'webpage',
-                      includes: 'My-details/**',
+                      includes: 'restuarent/**',
                       useDefaultExcludes: false
             }
         }
@@ -37,7 +37,7 @@ pipeline {
                 sh '''
                     sudo rm -rf /var/www/html/*
 
-                    sudo cp -r My-details/. /var/www/html/
+                    sudo cp -r restuarent/. /var/www/html/
 
                     ls -la /var/www/html/
                 '''
